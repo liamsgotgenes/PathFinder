@@ -1,25 +1,29 @@
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.*;
 
 public class node extends JPanel
 {
-    boolean wall;
-    boolean visited;
-    boolean start=false;
-    boolean stop=false;
-    int x;
-    int y;
+    private boolean wall;
+    private boolean visited;
+    private int dist;
+    private boolean start=false;
+    private boolean stop=false;
+    private int x;
+    private int y;
+    public node path=null;
 
-    public node()
+    public node(int x,int y)
     {
         super();
         wall=false;
         visited=false;
+        dist=-1;
         this.setBackground(Color.WHITE);
         this.addMouseListener(new MyMouse());
+        this.x=x;
+        this.y=y;
     }
 
     public void makeWall()
@@ -42,7 +46,7 @@ public class node extends JPanel
     {
         stop=true;
         wall=false;
-        stop=false;
+        start=false;
         this.setBackground(Color.RED);
     }
 
@@ -52,6 +56,41 @@ public class node extends JPanel
         start=false;
         stop=false;
         this.setBackground(Color.WHITE);
+    }
+
+    public void makePath()
+    {
+        this.setBackground(Color.BLUE);
+    }
+
+    public int getx()
+    {
+        return x;
+    }
+
+    public int gety()
+    {
+        return y;
+    }
+
+    public int getDist()
+    {
+        return dist;
+    }
+
+    public void setDist(int dist)
+    {
+        this.dist=dist;
+    }
+
+    public boolean isWall()
+    {
+        return wall;
+    }
+
+    public String toString()
+    {
+        return "Stop: "+this.stop+" Start: "+start+" Wall: "+wall+" Visited: "+visited+"\n("+x+","+y+")";
     }
 
     class MyMouse extends MouseAdapter
@@ -95,6 +134,7 @@ public class node extends JPanel
         {
             JRadioButton button=gui.getSelected();
             node tmp=(node)e.getSource();
+            gui.nodeLabel.setText(tmp.toString());
             if (button!=null)
             {
                 if (gui.pressed)
@@ -110,7 +150,5 @@ public class node extends JPanel
                 }
             }
         }
-
-
     }
 }
