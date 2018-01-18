@@ -63,6 +63,12 @@ public class node extends JPanel
         this.setBackground(Color.BLUE);
     }
 
+    public void makeVisited()
+    {
+        visited=true;
+        this.setBackground(Color.ORANGE);
+    }
+
     public int getx()
     {
         return x;
@@ -88,6 +94,11 @@ public class node extends JPanel
         return wall;
     }
 
+    public boolean isVisited()
+    {
+        return visited;
+    }
+
     public String toString()
     {
         return "Stop: "+this.stop+" Start: "+start+" Wall: "+wall+" Visited: "+visited+"\n("+x+","+y+")";
@@ -98,7 +109,7 @@ public class node extends JPanel
         public void mousePressed(MouseEvent e)
         {
             gui.pressed=true;
-            JRadioButton button=gui.getSelected();
+            JRadioButton button=gui.getOptionSelected();
             node tmp=(node)e.getSource();
             if (button!=null)
             {
@@ -132,7 +143,7 @@ public class node extends JPanel
 
         public void mouseEntered(MouseEvent e)
         {
-            JRadioButton button=gui.getSelected();
+            JRadioButton button=gui.getOptionSelected();
             node tmp=(node)e.getSource();
             gui.nodeLabel.setText(tmp.toString());
             if (button!=null)

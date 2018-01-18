@@ -3,8 +3,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 import java.awt.*;
@@ -18,8 +20,7 @@ class gui extends JFrame
     private JPanel gridPanel,optionPanel;
     public static JPanel topPanel, btmPanel;
     public static JLabel nodeLabel;
-    private JRadioButton start,stop,wallBut,erase;
-    public static ButtonGroup btnGroup;
+    public static ButtonGroup btnGroupOption, btnGroupSearch;
     public static node startNode,stopNode;
     public node[][] nodes=new node[100][100];
 
@@ -33,7 +34,6 @@ class gui extends JFrame
         createOptionPanel();
         gridPanel=new JPanel();
         gridPanel.setLayout(new GridLayout(100,100));
-        gridPanel.setBackground(Color.BLUE);
         fillGrid();
         add(gridPanel,BorderLayout.CENTER);
         add(optionPanel,BorderLayout.NORTH);
@@ -50,32 +50,73 @@ class gui extends JFrame
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                bfs();
+                String tmp=getSearchSelected().getText();
+                if (tmp.equals("BFS")) bfs();
+                else if (tmp.equals("Dijkstra")) dijkstra();
+                else aStar();
+
             }
         });
+        JButton reset=new JButton("Reset");
+        reset.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                reset();
+            }
+        });
+        JRadioButton start,stop,wallBut,erase;
         start=new JRadioButton("Start");
         start.setSelected(true);
         stop=new JRadioButton("Stop");
         wallBut=new JRadioButton("Walls");
         erase=new JRadioButton("Erase");
-        btnGroup=new ButtonGroup();
-        btnGroup.add(start);
-        btnGroup.add(stop);
-        btnGroup.add(wallBut);
-        btnGroup.add(erase);
+        btnGroupOption=new ButtonGroup();
+        btnGroupOption.add(start);
+        btnGroupOption.add(stop);
+        btnGroupOption.add(wallBut);
+        btnGroupOption.add(erase);
         topPanel.add(start);
         topPanel.add(stop);
         topPanel.add(wallBut);
         topPanel.add(erase);
         topPanel.add(go);
+
+
+        JRadioButton bfsBtn,dijBtn,aStarBtn;
+        bfsBtn=new JRadioButton("BFS");
+        dijBtn=new JRadioButton("Dijkstra");
+        aStarBtn=new JRadioButton("A*");
+        bfsBtn.setSelected(true);
+        btnGroupSearch=new ButtonGroup();
+        btnGroupSearch.add(bfsBtn);
+        btnGroupSearch.add(dijBtn);
+        btnGroupSearch.add(aStarBtn);
+        btmPanel=new JPanel();
+        btmPanel.add(bfsBtn);
+        btmPanel.add(dijBtn);
+        btmPanel.add(aStarBtn);
+        btmPanel.add(reset);
         optionPanel.setLayout(new GridLayout(2,0));
         optionPanel.add(topPanel);
-        optionPanel.add(nodeLabel);
+        optionPanel.add(btmPanel);
     }
 
-    public static JRadioButton getSelected()
+    public static JRadioButton getOptionSelected()
     {
-         Enumeration<AbstractButton> bm=btnGroup.getElements();
+         Enumeration<AbstractButton> bm=btnGroupOption.getElements();
+         while (bm.hasMoreElements())
+         {
+             AbstractButton button=bm.nextElement();
+             if (button.isSelected()) return (JRadioButton)button;
+         }
+         return null;
+    }
+
+    public static JRadioButton getSearchSelected()
+    {
+         Enumeration<AbstractButton> bm=btnGroupSearch.getElements();
          while (bm.hasMoreElements())
          {
              AbstractButton button=bm.nextElement();
@@ -95,6 +136,8 @@ class gui extends JFrame
             node e=q.remove();
             if (e==stopNode)
             {
+                //Color will turn orange without this
+                e.setBackground(Color.RED);
                 printPath(e);
                 break;
             }
@@ -104,12 +147,59 @@ class gui extends JFrame
                 node n=adjacentNodes.get(i);
                 if (n.getDist()==-1)
                 {
+                    n.makeVisited();
                     n.setDist(e.getDist()+1);
                     n.path=e;
                     q.add(n);
                 }
             }
         }
+    }
+
+    private void dijkstra()
+    {
+        startNode.setDist(0);
+        Comparator<Object> compare=new NodeCompare();
+        PriorityQueue<node> pq=new PriorityQueue<node>(compare);
+        for (int i=0;i<nodes.length;i++)
+        {
+            for (int j=0;j<nodes[i].length;j++)
+            {
+                pq.add(nodes[i][j]);
+            }
+        }
+        boolean found=false;
+        while (!pq.isEmpty())
+        {
+            if (found) break;
+            node e=pq.remove();
+            e.makeVisited();
+            ArrayList<node> adjacentNodes=getAdjacent(e.getx(),e.gety());
+            for (int i=0;i<adjacentNodes.size();i++)
+            {
+                node w=adjacentNodes.get(i);
+                if (!w.isVisited())
+                {
+                    if (w.getDist()==-1)
+                    {
+                        w.setDist(e.getDist()+1);
+                        w.path=e;
+                    }
+                    else if (e.getDist()+1<w.getDist())
+                    {
+                        w.setDist(e.getDist()+1);
+                        w.path=e;
+                    }
+                    if (w==stopNode) found=true;
+                }
+            }
+        }
+        printPath(stopNode);
+    }
+
+    private void aStar()
+    {
+
     }
 
     private void printPath(node e)
@@ -174,5 +264,11 @@ class gui extends JFrame
                 gridPanel.add(x);
             }
         }
+    }
+
+    private void reset()
+    {
+        this.dispose();
+        new gui();
     }
 }
