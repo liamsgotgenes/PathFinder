@@ -11,6 +11,7 @@ import java.util.Queue;
 
 import java.awt.*;
 import javax.swing.*;
+import java.lang.Math.*;
 
 
 
@@ -201,11 +202,41 @@ class gui extends JFrame
             }
         }
         printPath(stopNode);
+        stopNode.setBackground(Color.RED);
         nodeLabel.setText("Nodes Searched:"+String.valueOf(nodesSearched)+" Path Length:"+String.valueOf(pathLength));
     }
 
     private void aStar()
     {
+        Comparator<Object> compare=new NodeCompare();
+        PriorityQueue<node> pq=new PriorityQueue<node>(compare);
+        startNode.setDist(0);
+        pq.add(startNode);
+        boolean found=false;
+        int nodesSearched=0;
+        while (!pq.isEmpty()&&!found)
+        {
+            node u=pq.remove();
+            ArrayList<node> adjacentNodes=getAdjacent(u.getx(),u.gety());
+            for (int i=0;i<adjacentNodes.size();i++)
+            {
+                node v=adjacentNodes.get(i);
+                if (v.getDist()==-1||v.getDist()>u.getDist()+1)
+                {
+                    //v.setDist(u.getDist()+1);
+                    double priority=heuristic(v);
+                    v.setDist(priority);
+                    v.makeVisited();
+                    pq.add(v);
+                    v.path=u;
+                    nodesSearched++;
+                    if (v==stopNode) found=true;
+                }
+            }
+        }
+        printPath(stopNode);        
+        stopNode.setBackground(Color.RED);
+        nodeLabel.setText("Nodes Searched:"+String.valueOf(nodesSearched)+" Path Length:"+String.valueOf(pathLength));
 
     }
 
@@ -279,5 +310,16 @@ class gui extends JFrame
         this.dispose();
         new gui();
         this.pathLength=0;
+    }
+
+    private double heuristic(node e)
+    {
+        float a2=(Math.abs(e.getx()-stopNode.getx()));
+        float b2=(Math.abs(e.gety()-stopNode.gety()));
+        a2*=a2;
+        b2*=b2;
+        double c2=a2+b2;
+        c2=Math.sqrt(c2);
+        return c2;
     }
 }

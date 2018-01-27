@@ -5,8 +5,8 @@ public class NodeCompare implements Comparator
     @Override
     public int compare(Object a, Object b)
     {
-        int x=((node)a).getDist();
-        int y=((node)b).getDist();
+        double x=((node)a).getDist();
+        double y=((node)b).getDist();
         
         if (x==-1&&y==-1) return 0;
         if (x==-1) return 1;

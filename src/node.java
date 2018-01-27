@@ -7,7 +7,7 @@ public class node extends JPanel
 {
     private boolean wall;
     private boolean visited;
-    private int dist;
+    private double dist;
     private boolean start=false;
     private boolean stop=false;
     private int x;
@@ -79,12 +79,12 @@ public class node extends JPanel
         return y;
     }
 
-    public int getDist()
+    public double getDist()
     {
         return dist;
     }
 
-    public void setDist(int dist)
+    public void setDist(double dist)
     {
         this.dist=dist;
     }
