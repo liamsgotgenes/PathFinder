@@ -1,19 +1,17 @@
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
-
-import java.awt.*;
-import javax.swing.*;
-import java.lang.Math.*;
-
-
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 class gui extends JFrame
 {
@@ -23,7 +21,7 @@ class gui extends JFrame
     public static JLabel nodeLabel;
     public static ButtonGroup btnGroupOption, btnGroupSearch;
     public static node startNode,stopNode;
-    public node[][] nodes=new node[100][100];
+    public static node[][] nodes=new node[100][100];
     public static int pathLength=0;
 
     public gui()
@@ -52,9 +50,9 @@ class gui extends JFrame
             public void actionPerformed(ActionEvent e)
             {
                 String tmp=getSearchSelected().getText();
-                if (tmp.equals("BFS")) bfs();
-                else if (tmp.equals("Dijkstra")) dijkstra();
-                else aStar();
+                if (tmp.equals("BFS")) Search.bfs();
+                else if (tmp.equals("Dijkstra")) Search.dijkstra();
+                else Search.aStar();
 
             }
         });
@@ -128,119 +126,7 @@ class gui extends JFrame
          return null;
     }
 
-    private void bfs()
-    {
-        Queue<node> q=new LinkedList<node>();
-        startNode.setDist(0);
-        q.add(startNode);
-        int nodesSearched=0;
-
-        while (!q.isEmpty())
-        {
-            node e=q.remove();
-            if (e==stopNode)
-            {
-                //Color will turn orange without this
-                e.setBackground(Color.RED);
-                printPath(e);
-                nodeLabel.setText("Nodes Searched:"+String.valueOf(nodesSearched)+" Path Length:"+String.valueOf(pathLength));
-                break;
-            }
-            ArrayList<node> adjacentNodes=getAdjacent(e.getx(),e.gety());
-            for (int i=0;i<adjacentNodes.size();i++)
-            {
-                node n=adjacentNodes.get(i);
-                if (n.getDist()==-1)
-                {
-                    n.makeVisited();
-                    n.setDist(e.getDist()+1);
-                    n.path=e;
-                    q.add(n);
-                    nodesSearched++;
-                }
-            }
-        }
-    }
-
-    private void dijkstra()
-    {
-        Comparator<Object> compare=new NodeCompare();
-        PriorityQueue<node> pq=new PriorityQueue<node>(compare);
-        startNode.setDist(0);
-        pq.add(startNode);
-        boolean found=false;
-        int nodesSearched=0;
-        while (!pq.isEmpty()&&!found)
-        {
-            node u=pq.remove();
-            ArrayList<node> adjacentNodes=getAdjacent(u.getx(),u.gety());
-            for (int i=0;i<adjacentNodes.size();i++)
-            {
-                node v=adjacentNodes.get(i);
-                if (v.getDist()==-1)
-                {
-                    v.setDist(u.getDist()+1);
-                    v.path=u;
-                    v.makeVisited();
-                    pq.add(v);
-                    nodesSearched++;
-                    if (v==stopNode) found=true;
-                }
-                else
-                {
-                    if (v.getDist()>u.getDist()+1)
-                    {
-                        v.setDist(u.getDist()+1);
-                        v.path=u;
-                        v.makeVisited();
-                        pq.add(v);
-                        nodesSearched++;
-                        if (v==stopNode) found=true;
-                    }
-                }
-
-            }
-        }
-        printPath(stopNode);
-        stopNode.setBackground(Color.RED);
-        nodeLabel.setText("Nodes Searched:"+String.valueOf(nodesSearched)+" Path Length:"+String.valueOf(pathLength));
-    }
-
-    private void aStar()
-    {
-        Comparator<Object> compare=new NodeCompare();
-        PriorityQueue<node> pq=new PriorityQueue<node>(compare);
-        startNode.setDist(0);
-        pq.add(startNode);
-        boolean found=false;
-        int nodesSearched=0;
-        while (!pq.isEmpty()&&!found)
-        {
-            node u=pq.remove();
-            ArrayList<node> adjacentNodes=getAdjacent(u.getx(),u.gety());
-            for (int i=0;i<adjacentNodes.size();i++)
-            {
-                node v=adjacentNodes.get(i);
-                if (v.getDist()==-1||v.getDist()>u.getDist()+1)
-                {
-                    //v.setDist(u.getDist()+1);
-                    double priority=heuristic(v);
-                    v.setDist(priority);
-                    v.makeVisited();
-                    pq.add(v);
-                    v.path=u;
-                    nodesSearched++;
-                    if (v==stopNode) found=true;
-                }
-            }
-        }
-        printPath(stopNode);        
-        stopNode.setBackground(Color.RED);
-        nodeLabel.setText("Nodes Searched:"+String.valueOf(nodesSearched)+" Path Length:"+String.valueOf(pathLength));
-
-    }
-
-    private void printPath(node e)
+    public static void printPath(node e)
     {
         if (e.path!=null&&e.path!=startNode)
         {
@@ -250,7 +136,7 @@ class gui extends JFrame
         }
     }
 
-    private ArrayList<node> getAdjacent(int x,int y)
+    public static ArrayList<node> getAdjacent(int x,int y)
     {
         ArrayList<node> adjacentNodes=new ArrayList<node>();
         try
@@ -312,7 +198,7 @@ class gui extends JFrame
         this.pathLength=0;
     }
 
-    private double heuristic(node e)
+    public static double heuristic(node e)
     {
         float a2=(Math.abs(e.getx()-stopNode.getx()));
         float b2=(Math.abs(e.gety()-stopNode.gety()));
