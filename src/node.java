@@ -101,7 +101,7 @@ public class node extends JPanel
 
     public String toString()
     {
-        return "Stop: "+this.stop+" Start: "+start+" Wall: "+wall+" Visited: "+visited+"\n("+x+","+y+")";
+        return "Stop: "+this.stop+" Start: "+start+" Wall: "+wall+" Visited: "+visited+" ("+x+","+y+")";
     }
 
     class MyMouse extends MouseAdapter

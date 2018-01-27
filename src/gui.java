@@ -23,13 +23,13 @@ class gui extends JFrame
     public static ButtonGroup btnGroupOption, btnGroupSearch;
     public static node startNode,stopNode;
     public node[][] nodes=new node[100][100];
+    public static int pathLength=0;
 
     public gui()
     {
         setLayout(new BorderLayout());
         topPanel=new JPanel();
         optionPanel=new JPanel();
-        nodeLabel=new JLabel();
         optionPanel.setPreferredSize(new Dimension(100,100));
         createOptionPanel();
         gridPanel=new JPanel();
@@ -85,6 +85,7 @@ class gui extends JFrame
 
 
         JRadioButton bfsBtn,dijBtn,aStarBtn;
+        nodeLabel=new JLabel();
         bfsBtn=new JRadioButton("BFS");
         dijBtn=new JRadioButton("Dijkstra");
         aStarBtn=new JRadioButton("A*");
@@ -101,6 +102,7 @@ class gui extends JFrame
         optionPanel.setLayout(new GridLayout(2,0));
         optionPanel.add(topPanel);
         optionPanel.add(btmPanel);
+        optionPanel.add(nodeLabel);
     }
 
     public static JRadioButton getOptionSelected()
@@ -130,6 +132,7 @@ class gui extends JFrame
         Queue<node> q=new LinkedList<node>();
         startNode.setDist(0);
         q.add(startNode);
+        int nodesSearched=0;
 
         while (!q.isEmpty())
         {
@@ -139,6 +142,7 @@ class gui extends JFrame
                 //Color will turn orange without this
                 e.setBackground(Color.RED);
                 printPath(e);
+                nodeLabel.setText("Nodes Searched:"+String.valueOf(nodesSearched)+" Path Length:"+String.valueOf(pathLength));
                 break;
             }
             ArrayList<node> adjacentNodes=getAdjacent(e.getx(),e.gety());
@@ -151,6 +155,7 @@ class gui extends JFrame
                     n.setDist(e.getDist()+1);
                     n.path=e;
                     q.add(n);
+                    nodesSearched++;
                 }
             }
         }
@@ -158,43 +163,45 @@ class gui extends JFrame
 
     private void dijkstra()
     {
-        startNode.setDist(0);
         Comparator<Object> compare=new NodeCompare();
         PriorityQueue<node> pq=new PriorityQueue<node>(compare);
-        for (int i=0;i<nodes.length;i++)
-        {
-            for (int j=0;j<nodes[i].length;j++)
-            {
-                pq.add(nodes[i][j]);
-            }
-        }
+        startNode.setDist(0);
+        pq.add(startNode);
         boolean found=false;
-        while (!pq.isEmpty())
+        int nodesSearched=0;
+        while (!pq.isEmpty()&&!found)
         {
-            if (found) break;
-            node e=pq.remove();
-            e.makeVisited();
-            ArrayList<node> adjacentNodes=getAdjacent(e.getx(),e.gety());
+            node u=pq.remove();
+            ArrayList<node> adjacentNodes=getAdjacent(u.getx(),u.gety());
             for (int i=0;i<adjacentNodes.size();i++)
             {
-                node w=adjacentNodes.get(i);
-                if (!w.isVisited())
+                node v=adjacentNodes.get(i);
+                if (v.getDist()==-1)
                 {
-                    if (w.getDist()==-1)
-                    {
-                        w.setDist(e.getDist()+1);
-                        w.path=e;
-                    }
-                    else if (e.getDist()+1<w.getDist())
-                    {
-                        w.setDist(e.getDist()+1);
-                        w.path=e;
-                    }
-                    if (w==stopNode) found=true;
+                    v.setDist(u.getDist()+1);
+                    v.path=u;
+                    v.makeVisited();
+                    pq.add(v);
+                    nodesSearched++;
+                    if (v==stopNode) found=true;
                 }
+                else
+                {
+                    if (v.getDist()>u.getDist()+1)
+                    {
+                        v.setDist(u.getDist()+1);
+                        v.path=u;
+                        v.makeVisited();
+                        pq.add(v);
+                        nodesSearched++;
+                        if (v==stopNode) found=true;
+                    }
+                }
+
             }
         }
         printPath(stopNode);
+        nodeLabel.setText("Nodes Searched:"+String.valueOf(nodesSearched)+" Path Length:"+String.valueOf(pathLength));
     }
 
     private void aStar()
@@ -206,6 +213,7 @@ class gui extends JFrame
     {
         if (e.path!=null&&e.path!=startNode)
         {
+            pathLength++;
             e.path.makePath();
             printPath(e.path);
         }
@@ -270,5 +278,6 @@ class gui extends JFrame
     {
         this.dispose();
         new gui();
+        this.pathLength=0;
     }
 }
