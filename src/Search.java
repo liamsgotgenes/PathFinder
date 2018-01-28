@@ -34,8 +34,9 @@ public class Search
                 }
             }
         }
-        long stopTime=System.nanoTime();
-        print(nodesSearched,stopTime-startTime);
+        double stopTime=System.nanoTime()-startTime;
+        stopTime=stopTime*0.0000000001;
+        print(nodesSearched,stopTime);
     }
 
     public static void dijkstra()
@@ -65,9 +66,10 @@ public class Search
                 }
             }
         }
-        long stopTime=System.nanoTime();
-        print(nodesSearched,stopTime-startTime);
-    }
+        double stopTime=System.nanoTime()-startTime;
+        stopTime=stopTime*0.0000000001;
+        print(nodesSearched,stopTime);
+   }
 
     public static void aStar()
     {
@@ -97,11 +99,12 @@ public class Search
                 }
             }
         }
-        long stopTime=System.nanoTime();
-        print(nodesSearched,stopTime-startTime);
-    }
+        double stopTime=System.nanoTime()-startTime;
+        stopTime=stopTime*0.0000000001;
+        print(nodesSearched,stopTime);
+   }
 
-    private static void print(int nodesSearched,long time)
+    private static void print(int nodesSearched,double time)
     {
         gui.printPath(gui.stopNode);
         gui.stopNode.setBackground(Color.RED);

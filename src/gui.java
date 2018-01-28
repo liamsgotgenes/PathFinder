@@ -49,11 +49,18 @@ class gui extends JFrame
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                String tmp=getSearchSelected().getText();
-                if (tmp.equals("BFS")) Search.bfs();
-                else if (tmp.equals("Dijkstra")) Search.dijkstra();
-                else Search.aStar();
-
+                if (startNode==null||stopNode==null)
+                {
+                    nodeLabel.setText("A graph need both a start node and a stop node.");
+                }
+                else
+                {
+                    reset();
+                    String tmp=getSearchSelected().getText();
+                    if (tmp.equals("BFS")) Search.bfs();
+                    else if (tmp.equals("Dijkstra")) Search.dijkstra();
+                    else Search.aStar();
+                }
             }
         });
         JButton reset=new JButton("Reset");
@@ -82,7 +89,15 @@ class gui extends JFrame
         topPanel.add(erase);
         topPanel.add(go);
 
-
+        JButton clear=new JButton("Clear");
+        clear.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                clear();
+            }
+        });
         JRadioButton bfsBtn,dijBtn,aStarBtn;
         nodeLabel=new JLabel();
         bfsBtn=new JRadioButton("BFS");
@@ -98,7 +113,8 @@ class gui extends JFrame
         btmPanel.add(dijBtn);
         btmPanel.add(aStarBtn);
         btmPanel.add(reset);
-        optionPanel.setLayout(new GridLayout(2,0));
+        btmPanel.add(clear);
+        optionPanel.setLayout(new GridLayout(3,0));
         optionPanel.add(topPanel);
         optionPanel.add(btmPanel);
         optionPanel.add(nodeLabel);
@@ -193,9 +209,31 @@ class gui extends JFrame
 
     private void reset()
     {
+        for (int i=0;i<nodes.length;i++)
+        {
+            for (int j=0;j<nodes[i].length;j++)
+            {
+                node x=nodes[i][j];
+                if (x!=startNode&&x!=stopNode&&!x.isWall())
+                {
+                    x.resetNode();
+                }
+            }
+        }
+        pathLength=0;
+        startNode.path=null;
+        startNode.setDist(-1);
+        stopNode.path=null;
+        stopNode.setDist(-1);
+    }
+
+    private void clear()
+    {
         this.dispose();
         new gui();
-        this.pathLength=0;
+        pathLength=0;
+        startNode=null;
+        stopNode=null;
     }
 
     public static double heuristic(node e)

@@ -5,9 +5,9 @@ import javax.swing.*;
 
 public class node extends JPanel
 {
-    private boolean wall;
-    private boolean visited;
-    private double dist;
+    private boolean wall=false;
+    private boolean visited=false;
+    private double dist=-1;
     private boolean start=false;
     private boolean stop=false;
     private int x;
@@ -17,9 +17,6 @@ public class node extends JPanel
     public node(int x,int y)
     {
         super();
-        wall=false;
-        visited=false;
-        dist=-1;
         this.setBackground(Color.WHITE);
         this.addMouseListener(new MyMouse());
         this.x=x;
@@ -55,6 +52,7 @@ public class node extends JPanel
         wall=false;
         start=false;
         stop=false;
+        visited=false;
         this.setBackground(Color.WHITE);
     }
 
@@ -67,6 +65,13 @@ public class node extends JPanel
     {
         visited=true;
         this.setBackground(Color.ORANGE);
+    }
+
+    public void resetNode()
+    {
+        makeNothing();
+        dist=-1;
+        path=null;
     }
 
     public int getx()
