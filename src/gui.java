@@ -16,6 +16,7 @@ import javax.swing.JRadioButton;
 class gui extends JFrame
 {
     public static boolean pressed;
+    public boolean cleared=true;
     private JPanel gridPanel,optionPanel;
     public static JPanel topPanel, btmPanel;
     public static JLabel nodeLabel;
@@ -26,6 +27,7 @@ class gui extends JFrame
 
     public gui()
     {
+        setTitle("Path Finder");
         setLayout(new BorderLayout());
         topPanel=new JPanel();
         optionPanel=new JPanel();
@@ -229,8 +231,13 @@ class gui extends JFrame
 
     private void clear()
     {
-        this.dispose();
-        new gui();
+        for (int i=0;i<nodes.length;i++)
+        {
+            for (int j=0;j<nodes[i].length;j++)
+            {
+                nodes[i][j].resetNode();
+            }
+        }
         pathLength=0;
         startNode=null;
         stopNode=null;
